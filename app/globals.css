@@ -46,8 +46,7 @@ h1 em { color:#f6d0a3; }
 .hero-summary { color:#fff9f0; font-size:clamp(15px,1.15vw,18px); line-height:1.55; }
 .hero-link { display:inline-flex; align-items:center; gap:24px; border-bottom:1px solid #e9cba3; font-size:13px; font-weight:600; padding:9px 0; margin-top:20px; }
 .hero-link span { font-size:20px; line-height:1; }
-.hero-credit { position:absolute; inset:auto 0 25px; display:flex; align-items:center; justify-content:flex-end; gap:10px; color:#fff7e9; font-size:11px; }
-.hero-credit i,.detail-figure figcaption i { width:24px; height:1px; background:currentColor; opacity:.68; }
+.detail-figure figcaption i { width:24px; height:1px; background:currentColor; opacity:.68; }
 h2 { font-size:clamp(56px,6.3vw,108px); line-height:.98; letter-spacing:-.043em; }
 h2 em { color:var(--copper); font-weight:400; }
 .lead { font-size:clamp(16px,1.15vw,19px); line-height:1.6; max-width:39ch; color:var(--muted); }
@@ -161,7 +160,6 @@ address>a { font:29px var(--serif); }
   .hero-summary { max-width:32ch; font-size:15px; }
   .wide-only { display:none; }
   .hero-link { margin-top:10px; }
-  .hero-credit { font-size:10px; inset-block-end:16px; }
   h2 { font-size:clamp(54px,11vw,78px); }
   .tour-heading h2 { font-size:clamp(43px,8.5vw,64px); }
   .tour-heading { gap:9px; align-items:end; }
@@ -190,7 +188,6 @@ address>a { font:29px var(--serif); }
   .opening-stage { min-height:410px; }
   .title-block { bottom:37px; }
   h1 { font-size:62px; margin:12px 0; }
-  .hero-credit { inset-block-end:12px; }
   .hero-link { margin-top:5px; }
 }
 @media (prefers-reduced-motion:reduce) {
@@ -201,3 +198,38 @@ address>a { font:29px var(--serif); }
 .out-arrow { display:inline-block; width:11px; height:11px; position:relative; }
 .out-arrow::before { content:""; position:absolute; right:0; top:0; width:7px; height:7px; border-right:1.5px solid; border-top:1.5px solid; }
 .out-arrow::after { content:""; position:absolute; top:5px; right:-1px; width:13px; height:1.5px; background:currentColor; transform:rotate(-45deg); }
+.project-opening { height:auto; --edge-reveal:100%; --bakery-opacity:0; --base-opacity:1; }
+.project-opening[data-scroll] { height:205svh; }
+.project-opening .title-block { opacity:var(--base-opacity); }
+.bakery-opening { position:absolute; inset:0; background:#10283d; overflow:hidden; clip-path:inset(0 0 0 var(--edge-reveal)); }
+.bakery-cover { position:absolute; inset:var(--head) var(--edge) 60px 50%; display:grid; place-items:center; }
+.bakery-cover img { display:block; height:100%; width:100%; min-height:0; object-fit:contain; }
+.bakery-title { position:absolute; inset:auto 0 clamp(110px,19vh,240px); opacity:var(--bakery-opacity); pointer-events:none; }
+.bakery-title .hero-link { pointer-events:auto; }
+.bakery-title .label { color:#f0c695; }
+.bakery-title h2 { color:#fdf4e3; font:400 clamp(76px,min(9.1vw,15vh),160px)/.93 var(--serif); letter-spacing:-.04em; margin:22px 0; }
+.bakery-title h2 em { color:#f1c997; }
+.opening-rail { position:absolute; inset:auto 0 clamp(14px,3vh,37px); display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.project-switch { display:flex; gap:15px; align-items:center; }
+.project-switch button { background:transparent; color:#f9f3e9; border:0; border-bottom:2px solid #ffffff5e; font:600 12px/1.5 var(--sans); padding:8px 0; }
+.project-switch button[aria-pressed=true] { border-color:#f5cd9b; }
+.hero-caption { color:#f6eddb; font-size:11px; }
+.service .bakery-service-link { margin-right:20px; }
+@media(max-width:760px) {
+  .project-opening[data-scroll] { height:183svh; }
+  .bakery-cover { inset:calc(var(--head) + 12px) var(--edge) auto; height:48svh; }
+  .bakery-title { inset:auto 0 clamp(73px,11svh,110px); }
+  .bakery-title h2 { font-size:clamp(44px,12vw,80px); margin:8px 0; }
+  .bakery-title h2 br { display:none; }
+  .bakery-title h2 em::before { content:" "; }
+  .bakery-title .hero-summary { font-size:14px; }
+  .project-switch { gap:11px; }
+  .project-switch button { font-size:11px; }
+  .hero-caption { font-size:9px; text-align:right; }
+}
+@media (max-height:590px) and (orientation:landscape) {
+  .bakery-title { inset:auto 0 65px; }
+  .bakery-title h2 { font-size:58px; margin:8px 0; }
+  .bakery-cover { inset:calc(var(--head) + 8px) var(--edge) 48px 56%; height:auto; }
+  .project-opening .title-block { bottom:63px; }
+}

@@ -6,7 +6,7 @@ import "./globals.css";
 
 export const metadata = {
   title: "Vriddhi Interior Designer | Interiors in Prayagraj",
-  description: "Explore a Prayagraj home by Vriddhi Interior Designer. Enquire about full-home interiors, modular kitchens, renovations, commercial spaces and design consultations.",
+  description: "Explore a private residence and the Bakers Gallery storefront with Vriddhi Interior Designer. Enquire about home and commercial interiors in Prayagraj.",
 };
 
 export default function RootLayout({ children }) {

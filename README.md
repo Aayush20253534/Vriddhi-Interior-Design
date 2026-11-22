@@ -10,6 +10,10 @@ A static Next.js portfolio for the interior design studio in Prayagraj.
 
 The opening uses landscape and portrait architectural visualisations based on the studio’s reel. The five room photographs and three material studies are frames from the footage, individually cropped, colour-graded, denoised and sharpened. The desktop gallery advances with page scroll. Smaller screens use a native swipe gallery, and visitors with reduced motion enabled can browse without pinned scrolling or animated transitions.
 
+## Bakers Gallery
+
+The homepage scrolls between the residence and Bakers Gallery. The dedicated project page at `/projects/bakers-gallery/` opens with an illustrated elevation derived from the supplied storefront study. Scrolling reveals the colour study, then scrubs two short, silent clips from the original interior footage. Chapter buttons work with a keyboard and show stills when reduced motion is enabled. Video assets are requested as the visitor approaches their chapters.
+
 ## Run and deploy
 
 Use Node.js 22 or later. Run `npm ci` and `npm run dev` for local development. Run `npm run build` to create the static production export in `out/`.

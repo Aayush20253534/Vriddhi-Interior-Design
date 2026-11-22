@@ -3,16 +3,16 @@
 import { useEffect, useRef, useState } from "react";
 import { details, rooms, whatsapp } from "./project";
 
-const navigation = [["Residence", "#project"], ["Design details", "#details"], ["Services", "#services"], ["Studio", "#studio"]];
+const navigation = [["Residence", "#project"], ["Bakers Gallery", "/projects/bakers-gallery/"], ["Services", "#services"], ["Studio", "#studio"]];
 
-export function SiteHeader() {
+export function SiteHeader({ projectPage = false }) {
   const header = useRef(null);
   const menu = useRef(null);
   const toggle = useRef(null);
   useEffect(() => {
     const hero = document.querySelector(".opening");
     function update() {
-      header.current.toggleAttribute("data-solid", hero.getBoundingClientRect().bottom < 90);
+      header.current.toggleAttribute("data-solid", !hero || hero.getBoundingClientRect().bottom < 90);
     }
     function escape(event) {
       if (event.key === "Escape" && menu.current.open) {
@@ -31,11 +31,11 @@ export function SiteHeader() {
     };
   }, []);
   function links() {
-    return navigation.map(([label, target]) => <a href={target} key={target} onClick={() => { menu.current.open = false; }}>{label}</a>);
+    return navigation.map(([label, target]) => <a href={projectPage && target.startsWith("#") ? "/" + target : target} aria-current={projectPage && target.startsWith("/") ? "page" : undefined} key={target} onClick={() => { menu.current.open = false; }}>{label}</a>);
   }
-  return <header className="mast" ref={header}>
+  return <header className="mast" data-solid={projectPage ? "" : undefined} ref={header}>
     <div className="mast-inner shell">
-      <a className="brand" href="#top" aria-label="Vriddhi Interior Designer, home">
+      <a className="brand" href={projectPage ? "/" : "#top"} aria-label="Vriddhi Interior Designer, home">
         <img src="/images/vriddhi-mark.webp" width="48" height="48" alt="" />
         <span>Vriddhi<small>Interior Designer</small></span>
       </a>
@@ -53,27 +53,11 @@ export function SiteHeader() {
 export function PageMotion() {
   useEffect(() => {
     const preference = window.matchMedia("(prefers-reduced-motion: no-preference)");
-    const stage = document.querySelector(".opening");
-    let frame = 0;
     let observer;
-    function paint() {
-      frame = 0;
-      const distance = -stage.getBoundingClientRect().top;
-      if (distance > stage.offsetHeight) return;
-      const progress = Math.min(1, Math.max(0, distance / (stage.offsetHeight * .72)));
-      stage.style.setProperty("--drift", (progress * 8).toFixed(2) + "%");
-      stage.style.setProperty("--zoom", (1 + progress * .1).toFixed(3));
-      stage.style.setProperty("--copy-lift", (-progress * 48).toFixed(1) + "px");
-    }
-    function queue() { if (!frame) frame = requestAnimationFrame(paint); }
     function setup() {
       observer?.disconnect();
-      window.removeEventListener("scroll", queue);
-      cancelAnimationFrame(frame);
-      frame = 0;
       if (!preference.matches) {
         for (const el of document.querySelectorAll("[data-reveal]")) el.removeAttribute("data-pending");
-        stage.removeAttribute("style");
         return;
       }
       if ("IntersectionObserver" in window) {
@@ -88,16 +72,12 @@ export function PageMotion() {
           observer.observe(el);
         }
       }
-      paint();
-      window.addEventListener("scroll", queue, { passive: true });
     }
     setup();
     preference.addEventListener("change", setup);
     return () => {
       observer?.disconnect();
       preference.removeEventListener("change", setup);
-      window.removeEventListener("scroll", queue);
-      cancelAnimationFrame(frame);
     };
   }, []);
   return null;
