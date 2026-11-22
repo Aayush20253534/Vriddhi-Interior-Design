@@ -1,17 +1,21 @@
 # Vriddhi Interior Designer
 
-A static Next.js portfolio for the studio’s interior design services in Prayagraj. The room gallery and design details use photographs extracted from the studio’s marketing reel.
+A static Next.js portfolio for the interior design studio in Prayagraj.
 
-![Vriddhi homepage on desktop](docs/homepage.webp)
+![Desktop opening](docs/homepage.webp)
 
-## Local development
+[Watch the scroll preview](docs/scroll-preview.webp) · [See the phone layout](docs/mobile.webp)
 
-Use Node.js 22 or later. Run `npm ci`, then `npm run dev`. To generate the production site in `out/`, run `npm run build`.
+## The residence
 
-## Vercel
+The opening uses landscape and portrait architectural visualisations based on the studio’s reel. The five room photographs and three material studies are frames from the footage, individually cropped, colour-graded, denoised and sharpened. The desktop gallery advances with page scroll. Smaller screens use a native swipe gallery, and visitors with reduced motion enabled can browse without pinned scrolling or animated transitions.
 
-Import this repository and select the Next.js framework preset. The site builds as a static export. All project images and fonts are served with the site. Enquiry buttons open WhatsApp with the chosen service and location already filled in.
+## Run and deploy
+
+Use Node.js 22 or later. Run `npm ci` and `npm run dev` for local development. Run `npm run build` to create the static production export in `out/`.
+
+On Vercel, import the repository and keep the Next.js framework preset and default build settings. All fonts and imagery are served with the site. Service enquiries link directly to WhatsApp.
 
 ## Content
 
-Room captions, design details, service descriptions and WhatsApp messages are in `app/project.js`. The landing page and office details are in `app/page.jsx`. Responsive project photographs are in `public/images/`.
+Room captions, material descriptions, services and WhatsApp messages live in `app/project.js`. The landing page and studio address are in `app/page.jsx`.

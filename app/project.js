@@ -1,8 +1,8 @@
 export const rooms = [
-  { file: "living", name: "Living room", palette: "Blush & ivory", alt: "Living room with a curved illuminated ceiling, open timber divider and patterned sofa.", position: "50% 65%" },
+  { file: "living", name: "Living room", palette: "Blush & ivory", alt: "Blush and ivory living-room feature wall with a circular panel and a curved, illuminated ceiling.", position: "50% 65%" },
   { file: "kitchen", name: "Modular kitchen", palette: "Ivory & charcoal", alt: "A galley kitchen with glossy upper cabinets on either side of a bright window.", position: "50% 55%" },
   { file: "primary", name: "Primary bedroom", palette: "Peach & wood", alt: "Peach-toned joinery and a rose upholstered headboard frame the primary bedroom.", position: "50% 75%" },
-  { file: "children", name: "Children’s room", palette: "Lavender & rose", alt: "Lavender cabinetry beside a scalloped rose headboard in the children’s room.", position: "50% 65%" },
+  { file: "children", name: "Children’s room", palette: "Lavender & rose", alt: "Arched lavender shelving above a study desk beside the rose headboard in the children’s room.", position: "50% 65%" },
   { file: "guest", name: "Guest bedroom", palette: "Navy & white", alt: "Navy headboard and deep blue ceiling trim in a bright white guest bedroom.", position: "50% 72%" },
 ];
 
