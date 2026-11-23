@@ -1,87 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { details, rooms, whatsapp } from "./project";
-
-const navigation = [["Residence", "#project"], ["Bakers Gallery", "/projects/bakers-gallery/"], ["Services", "#services"], ["Studio", "#studio"]];
-
-export function SiteHeader({ projectPage = false }) {
-  const header = useRef(null);
-  const menu = useRef(null);
-  const toggle = useRef(null);
-  useEffect(() => {
-    const hero = document.querySelector(".opening");
-    function update() {
-      header.current.toggleAttribute("data-solid", !hero || hero.getBoundingClientRect().bottom < 90);
-    }
-    function escape(event) {
-      if (event.key === "Escape" && menu.current.open) {
-        menu.current.open = false;
-        toggle.current.focus();
-      }
-    }
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
-    window.addEventListener("keydown", escape);
-    return () => {
-      window.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
-      window.removeEventListener("keydown", escape);
-    };
-  }, []);
-  function links() {
-    return navigation.map(([label, target]) => <a href={projectPage && target.startsWith("#") ? "/" + target : target} aria-current={projectPage && target.startsWith("/") ? "page" : undefined} key={target} onClick={() => { menu.current.open = false; }}>{label}</a>);
-  }
-  return <header className="mast" data-solid={projectPage ? "" : undefined} ref={header}>
-    <div className="mast-inner shell">
-      <a className="brand" href={projectPage ? "/" : "#top"} aria-label="Vriddhi Interior Designer, home">
-        <img src="/images/vriddhi-mark.webp" width="48" height="48" alt="" />
-        <span>Vriddhi<small>Interior Designer</small></span>
-      </a>
-      <nav className="desk-nav" aria-label="Main navigation">{links()}</nav>
-      <a className="enquire" href={whatsapp()}>Enquire <span className="out-arrow" aria-hidden="true" /></a>
-      <details className="mobile-nav" ref={menu}>
-        <summary aria-label="Navigation menu" ref={toggle}><i /><i /></summary>
-        <nav aria-label="Mobile navigation">{links()}</nav>
-      </details>
-    </div>
-  </header>;
-}
-
-// The document stays readable before hydration and when reduced motion is enabled.
-export function PageMotion() {
-  useEffect(() => {
-    const preference = window.matchMedia("(prefers-reduced-motion: no-preference)");
-    let observer;
-    function setup() {
-      observer?.disconnect();
-      if (!preference.matches) {
-        for (const el of document.querySelectorAll("[data-reveal]")) el.removeAttribute("data-pending");
-        return;
-      }
-      if ("IntersectionObserver" in window) {
-        observer = new IntersectionObserver(entries => {
-          for (const entry of entries) if (entry.isIntersecting) {
-            entry.target.removeAttribute("data-pending");
-            observer.unobserve(entry.target);
-          }
-        }, { threshold: .08 });
-        for (const el of document.querySelectorAll("[data-reveal]")) {
-          if (el.getBoundingClientRect().top >= innerHeight) el.setAttribute("data-pending", "");
-          observer.observe(el);
-        }
-      }
-    }
-    setup();
-    preference.addEventListener("change", setup);
-    return () => {
-      observer?.disconnect();
-      preference.removeEventListener("change", setup);
-    };
-  }, []);
-  return null;
-}
+import { useRef, useState } from "react";
+import {gsap,useGSAP,moveTo,motionQuery} from "./motion";
+import { details, rooms } from "./project";
 
 function ProjectImage({ item, sizes }) {
   return <img src={`/images/${item.file}-1080.webp`}
@@ -95,55 +16,38 @@ export function RoomGallery() {
   const track = useRef(null);
   const [limits, setLimits] = useState({ start: true, end: false });
 
-  useEffect(() => {
-    const root = scene.current, view = viewport.current, strip = track.current;
-    const cinema = window.matchMedia("(min-width: 980px) and (min-height: 680px) and (prefers-reduced-motion: no-preference)");
-    let travel = 0, frame = 0;
-    function paint() {
-      frame = 0;
-      const offset = cinema.matches ? Math.min(travel, Math.max(0, -root.getBoundingClientRect().top)) : view.scrollLeft;
-      if (cinema.matches) strip.style.transform = `translate3d(${-offset}px,0,0)`;
-      root.style.setProperty("--travel", travel > 0 ? offset / travel : 1);
-      const start = offset < 2, end = offset >= travel - 2;
-      setLimits(last => last.start === start && last.end === end ? last : {start, end});
-    }
-    function queue() { if (!frame) frame = requestAnimationFrame(paint); }
-    function measure() {
-      if (cinema.matches && !root.hasAttribute("data-pinned")) view.scrollLeft = 0;
-      root.toggleAttribute("data-pinned", cinema.matches);
-      travel = Math.max(0, strip.scrollWidth - view.clientWidth);
-      if (cinema.matches) {
-        root.style.height = (root.firstElementChild.offsetHeight + travel) + "px";
-      } else {
-        root.style.height = "";
-        strip.style.transform = "";
+  const pin=useRef(null);
+  useGSAP(()=>{
+    const root=scene.current, view=viewport.current, strip=track.current;
+    const media=gsap.matchMedia();
+    media.add({wide:motionQuery+" and (min-width:980px) and (min-height:680px)",always:"all"},({conditions})=>{
+      const distance=()=>Math.max(0,strip.scrollWidth-view.clientWidth);
+      function status(value){root.style.setProperty("--travel",value);const start=value<.002,end=value>.998;setLimits(old=>old.start===start&&old.end===end?old:{start,end});}
+      if(conditions.wide){
+        root.dataset.pinned=""; view.scrollLeft=0;
+        const animation=gsap.to(strip,{x:()=>-distance(),ease:"none",scrollTrigger:{
+          trigger:root,pin:root.firstElementChild,start:"top top",end:()=>"+="+distance(),scrub:.35,invalidateOnRefresh:true,anticipatePin:1,onUpdate:t=>status(t.progress)
+        }});
+        pin.current=animation.scrollTrigger;status(pin.current.progress);
+        return ()=>{pin.current=null;delete root.dataset.pinned;};
       }
-      paint();
-    }
-    const resize = new ResizeObserver(measure);
-    resize.observe(view);
-    resize.observe(root.firstElementChild);
-    cinema.addEventListener("change", measure);
-    window.addEventListener("scroll", queue, {passive:true});
-    view.addEventListener("scroll", queue, {passive:true});
-    measure();
-    return () => {
-      resize.disconnect();
-      cinema.removeEventListener("change", measure);
-      window.removeEventListener("scroll", queue);
-      view.removeEventListener("scroll", queue);
-      cancelAnimationFrame(frame);
-    };
-  }, []);
+      const update=()=>status(view.scrollLeft/Math.max(1,distance()));
+      const observer=new ResizeObserver(update);observer.observe(view);view.addEventListener("scroll",update,{passive:true});update();
+      return ()=>{observer.disconnect();view.removeEventListener("scroll",update);};
+    });
+    return ()=>media.revert();
+  },{scope:scene});
 
   function step(direction) {
     const root = scene.current, view = viewport.current, strip = track.current;
     const advance = strip.children[1].offsetLeft - strip.children[0].offsetLeft;
     const options = { behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" };
     if (root.hasAttribute("data-pinned")) {
-      const top = window.scrollY + root.getBoundingClientRect().top;
-      const travel = Math.min(Math.max(window.scrollY - top + direction * advance, 0), strip.scrollWidth - view.clientWidth);
-      window.scrollTo({top:top + travel, ...options});
+      const top = pin.current.start;
+      const distance = strip.scrollWidth - view.clientWidth;
+      const current = Math.min(distance, Math.max(0, window.scrollY - top));
+      const travel = Math.min(distance, Math.max(0, current + direction * advance));
+      moveTo(top + travel);
     } else view.scrollBy({left: direction * advance, ...options});
   }
 

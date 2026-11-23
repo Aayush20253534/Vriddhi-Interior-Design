@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState, useEffect } from "react";
 import { clamp, useScrollSequence } from "../../scroll-sequence";
 
 const chapters = [
@@ -16,34 +16,39 @@ function Still({ name, alt, priority = false }) {
     loading={priority ? "eager" : "lazy"} fetchPriority={priority ? "high" : "auto"} decoding="async" alt={alt} />;
 }
 
-// Coalesce fast wheel/touch updates into the next available decoded frame.
-function seekFrame(video) {
-  if (!video || video.readyState < 2 || video.seeking || !Number.isFinite(video.duration)) return;
-  video.dataset.ready = "";
-  const time = Number(video.dataset.fraction || 0) * Math.max(0, video.duration - 1 / 24);
-  if (Math.abs(time-video.currentTime) > 1 / 30) video.currentTime = time;
-}
-function updateClip(video, fraction, wanted) {
-  if (!video || !wanted) return;
-  video.dataset.fraction = String(clamp(fraction));
-  if (!video.getAttribute("src")) {
-    video.preload = "auto";
-    video.src = video.dataset.file;
-    video.load();
-  }
-  seekFrame(video);
-}
-function Clip({ name, alt, videoRef, visited, active }) {
+// One bounded atlas per active chapter. Drawing neighbouring frames avoids decoder
+// seeks during a rapid change of scroll direction.
+function Clip({name,alt,videoRef,visited,active}) {
+  const canvas=useRef(null);
+  useEffect(()=>{
+    if (!visited || !matchMedia("(prefers-reduced-motion: no-preference) and (min-height: 640px)").matches) return;
+    const el=canvas.current;
+    const width=el.clientWidth<390?320:480;
+    const height=width*1.25;
+    el.width=width; el.height=height;
+    const ctx=el.getContext("2d");
+    const atlas=new Image();
+    let last=-1;
+    function draw() {
+      const f=clamp(videoRef.current.progress)*17;
+      if (!ctx || !atlas.naturalWidth || f===last) return;
+      const index=Math.floor(f);
+      function frame(i){ctx.drawImage(atlas,(i%6)*width,Math.floor(i/6)*height,width,height,0,0,width,height);}
+      frame(index);
+      if(index<17){ctx.globalAlpha=f-index;frame(index+1);ctx.globalAlpha=1;}
+      last=f;el.dataset.frame=String(index);
+    }
+    videoRef.current.draw=draw;
+    atlas.onload=draw;atlas.src=`/images/sequence/${name}-${width}.webp`;
+    return ()=>{atlas.onload=null;videoRef.current.draw=null;delete el.dataset.frame;};
+  },[visited,name,videoRef]);
   return <div className={`study-plane clip-${name}`} aria-hidden={!active}>
-    {visited && <Still name={name} alt={alt} />}
-    <video ref={videoRef} data-file={`/images/bakers/${name}.mp4`} preload="none" muted playsInline aria-hidden="true"
-      onLoadedData={e=>seekFrame(e.currentTarget)} onSeeked={e=>seekFrame(e.currentTarget)}
-      onError={e=>e.currentTarget.removeAttribute("data-ready")} />
+    {visited && <Still name={name} alt={alt}/>}<canvas ref={canvas} aria-hidden="true"/>
   </div>;
 }
 
 export default function BakersJourney() {
-  const shelves = useRef(null), cabinet = useRef(null);
+  const shelves = useRef({progress:0}), cabinet = useRef({progress:0});
   const [chapter, setChapter] = useState(0);
   const [visited, setVisited] = useState(0);
   const [colour, setColour] = useState(false);
@@ -57,8 +62,10 @@ export default function BakersJourney() {
     setChapter(activeChapter);
     setVisited(last => Math.max(last, p > .63 ? 2 : p > .28 ? 1 : 0));
     setColour(wipe > .55);
-    updateClip(shelves.current,(p-.375)/.275,moving && p>.295 && p<.745);
-    updateClip(cabinet.current,(p-.715)/.285,moving && p>.64);
+    shelves.current.progress=(p-.375)/.275;
+    cabinet.current.progress=(p-.715)/.285;
+    if(moving && activeChapter===1) shelves.current.draw?.();
+    if(moving && activeChapter===2) cabinet.current.draw?.();
   }, []);
   const [section,jump] = useScrollSequence(apply);
   return <section className="bakery-journey" ref={section} aria-labelledby="bakery-title">

@@ -1,0 +1,4 @@
+import {RoomGallery,DesignDetails} from "../../components";
+import {NextProject} from "../../editorial";
+export const metadata={title:"Ek Ghar. Paanch Rang. | Vriddhi Interior Designer",description:"Five rooms in a Prayagraj residence by architect Shalini Kushvaha."};
+export default function Residence(){return <main id="content"><header className="res-case"><picture><source media="(max-width:700px)" srcSet="/images/residence-portrait.webp"/><img src="/images/residence-1672.webp" alt="Living room visualisation with a sculpted ceiling and fluted divider." fetchPriority="high"/></picture><div className="shell"><p className="label">Private residence · Prayagraj</p><h1 data-split>Ek Ghar.<br/><em>Paanch Rang.</em></h1><p>Design · Shalini Kushvaha</p><small>Living room · Studio visualisation</small></div></header><RoomGallery/><DesignDetails/><NextProject index={1}/></main>;}

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useState } from "react";
 import { clamp, useScrollSequence } from "./scroll-sequence";
 
@@ -26,16 +27,16 @@ export function FeaturedOpening() {
       <div className="opening-shade" />
       <div className="title-block shell" inert={project!==0}>
         <p className="label">Interior design studio <span>·</span> Prayagraj</p>
-        <h1><span><b>Ek Ghar.</b></span><span><em>Paanch Rang.</em></span></h1>
+        <h1 data-split><span><b>Ek Ghar.</b></span><span><em>Paanch Rang.</em></span></h1>
         <p className="hero-summary">One home, five colours. A private residence by<br className="wide-only" /> architect Shalini Kushvaha.</p>
-        <a className="hero-link" href="#project">Explore the rooms <span aria-hidden="true">↓</span></a>
+        <Link className="hero-link" href="/projects/residence/">Explore the residence <span aria-hidden="true">↓</span></Link>
       </div>
       <div className="bakery-opening" inert={project!==1}>
         <div className="bakery-cover">{coverReady && <img src="/images/bakers/front-window-960.webp" srcSet="/images/bakers/front-window-540.webp 540w, /images/bakers/front-window-960.webp 960w" sizes="(max-width: 760px) 80vw, 50vw" loading="lazy" alt="Bakers Gallery storefront study with illuminated gold lettering above two navy arches." />}</div>
         <div className="bakery-title shell">
           <p className="label">Commercial interiors</p><h2>Bakers<br /><em>Gallery.</em></h2>
           <p className="hero-summary">From the blue storefront to the shelves within.</p>
-          <a className="hero-link" href="/projects/bakers-gallery/">Enter the project <span className="out-arrow" aria-hidden="true" /></a>
+          <Link className="hero-link" href="/projects/bakers-gallery/">Enter the project <span className="out-arrow" aria-hidden="true" /></Link>
         </div>
       </div>
       <div className="opening-rail shell">
