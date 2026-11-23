@@ -2,9 +2,7 @@
 
 A static Next.js portfolio for the interior design studio in Prayagraj.
 
-![Desktop opening](docs/homepage.webp)
-
-[Watch the scroll preview](docs/scroll-preview.webp) · [See the phone layout](docs/mobile.webp)
+The site connects Home, Portfolio, Residence, Bakers Gallery, Services, Studio and Contact. GSAP and ScrollTrigger drive the scenes. Lenis shares their animation clock on fine-pointer devices. Touch devices use native scrolling.
 
 ## The residence
 
@@ -12,7 +10,7 @@ The opening uses landscape and portrait architectural visualisations based on th
 
 ## Bakers Gallery
 
-The homepage scrolls between the residence and Bakers Gallery. The dedicated project page at `/projects/bakers-gallery/` opens with an illustrated elevation derived from the supplied storefront study. Scrolling reveals the colour study, then scrubs two short, silent clips from the original interior footage. Chapter buttons work with a keyboard and show stills when reduced motion is enabled. Video assets are requested as the visitor approaches their chapters.
+The homepage scrolls between the residence and Bakers Gallery. The dedicated project page at `/projects/bakers-gallery/` opens with an illustrated elevation derived from the supplied storefront study. Scrolling reveals the colour study, then scrubs responsive WebP frame sequences sampled from the original interior footage. Chapter buttons work with a keyboard and show stills when reduced motion is enabled. Frame atlases are requested as visitors approach each chapter.
 
 ## Run and deploy
 
@@ -22,4 +20,4 @@ On Vercel, import the repository and keep the Next.js framework preset and defau
 
 ## Content
 
-Room captions, material descriptions, services and WhatsApp messages live in `app/project.js`. The landing page and studio address are in `app/page.jsx`.
+Room captions, material descriptions, services and WhatsApp messages live in `app/project.js`. Contact details and the enquiry handoff are in `app/contact/`.

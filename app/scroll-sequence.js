@@ -1,59 +1,30 @@
 "use client";
+import { useRef } from "react";
+import { gsap,useGSAP,moveTo,motionQuery } from "./motion";
+export const clamp = n => Math.max(0, Math.min(1,n));
 
-import { useEffect, useRef } from "react";
-
-export const clamp = (n) => Math.max(0, Math.min(1, n));
-
-// Scroll and chapter buttons use the same progress, including after a resize.
 export function useScrollSequence(apply) {
   const section = useRef(null);
-  const active = useRef(false);
-  const position = useRef(0);
-
-  useEffect(() => {
-    const root = section.current;
-    const query = matchMedia("(prefers-reduced-motion: no-preference) and (min-height: 640px)");
-    let frame = 0;
-    let lastProgress = null;
-    function paint() {
-      frame = 0;
-      const travel = root.offsetHeight - root.firstElementChild.offsetHeight;
-      const progress = active.current && travel > 0 ? clamp(-root.getBoundingClientRect().top / travel) : position.current;
-      if (progress === lastProgress) return;
-      lastProgress = progress;
-      position.current = progress;
-      apply(root, progress, active.current);
-    }
-    function queue() { if (!frame) frame = requestAnimationFrame(paint); }
-    function configure() {
-      active.current = query.matches;
-      lastProgress = null;
-      window.removeEventListener("scroll", queue);
-      if (active.current) window.addEventListener("scroll", queue, {passive:true});
-      root.toggleAttribute("data-scroll", active.current);
-      paint();
-    }
-    const resize = new ResizeObserver(queue);
-    resize.observe(root.firstElementChild);
-    configure();
-    query.addEventListener("change", configure);
-    return () => {
-      cancelAnimationFrame(frame);
-      resize.disconnect();
-      query.removeEventListener("change", configure);
-      window.removeEventListener("scroll", queue);
-    };
-  }, [apply]);
-
-  function jump(target) {
-    const root = section.current;
-    if (!active.current) {
-      position.current = target;
-      apply(root, target, false);
-      return;
-    }
-    const start = scrollY + root.getBoundingClientRect().top;
-    window.scrollTo({ top: start + target * (root.offsetHeight - root.firstElementChild.offsetHeight), behavior: "smooth" });
+  const trigger = useRef(null);
+  useGSAP(() => {
+    const root=section.current, media=gsap.matchMedia();
+    media.add({cinema: motionQuery+" and (min-height: 640px)",always:"all"}, context => {
+      const enabled=context.conditions.cinema;
+      apply(root,0,enabled);
+      if (!enabled) return;
+      root.dataset.scroll="";
+      const playhead={p:0};
+      const tween=gsap.to(playhead,{p:1,ease:"none",onUpdate:()=>apply(root,playhead.p,true),
+        scrollTrigger:{trigger:root,start:"top top",end:"bottom bottom",scrub:.32,invalidateOnRefresh:true}});
+      trigger.current=tween.scrollTrigger;
+      return () => { delete root.dataset.scroll; trigger.current=null; };
+    });
+    return () => media.revert();
+  },{scope:section,dependencies:[apply],revertOnUpdate:true});
+  function jump(p) {
+    const t=trigger.current;
+    if (t) moveTo(t.start+p*(t.end-t.start));
+    else apply(section.current,p,false);
   }
-  return [section, jump];
+  return [section,jump];
 }
